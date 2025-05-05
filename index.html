@@ -73,10 +73,30 @@
       line-height:1;
       width:1.8rem; height:1.8rem;
     }
-    #summary p {
-      margin: .4rem 0;
+    /* --- סיכום תמהיל --- */
+    .summary-labels {
+      display:grid;
+      grid-template-columns: repeat(4,1fr);
+      gap:.5rem;
+      margin-bottom:.3rem;
+    }
+    .summary-labels div {
+      text-align:center;
+      font-weight:600;
+    }
+    #summary {
+      display:grid;
+      grid-template-columns: repeat(4,1fr);
+      gap:.5rem;
+      margin-bottom:1rem;
+    }
+    #summary span {
+      display:block;
+      padding:.4rem;
+      background:var(--gray);
+      text-align:center;
+      border-radius:var(--radius);
       font-weight:500;
-      text-align:right;
     }
     #chart-container {
       height:300px;
@@ -86,12 +106,16 @@
     @media(max-width:600px){
       th, td { font-size:.9rem; }
       .controls button { width:100%; margin:0 .2rem .5rem 0; }
+      .summary-labels, #summary {
+        grid-template-columns: 1fr; text-align:center;
+      }
     }
   </style>
 </head>
 <body>
   <h1>מחשבון תמהיל משכנתא</h1>
   <div id="calculator">
+
     <div class="controls">
       <button id="addRow">+ הוסף מסלול</button>
     </div>
@@ -111,12 +135,19 @@
       <tbody id="table-body"></tbody>
     </table>
 
-    <h2>סיכום תמהיל</h2>
+    <!-- כותרות הסיכום -->
+    <div class="summary-labels">
+      <div>סה"כ קרן</div>
+      <div>סה"כ החזר חודשי</div>
+      <div>סה"כ עלות</div>
+      <div>החזר לכל 1 ₪</div>
+    </div>
+    <!-- ערכי הסיכום -->
     <div id="summary">
-      <p>סה"כ קרן: <span id="sumP">0</span> ₪</p>
-      <p>סה"כ החזר חודשי: <span id="sumM">0</span> ₪</p>
-      <p>סה"כ עלות: <span id="sumC">0</span> ₪</p>
-      <p>החזר לכל 1 ₪: <span id="perShekel">0.00</span></p>
+      <span id="sumP">0</span>
+      <span id="sumM">0</span>
+      <span id="sumC">0</span>
+      <span id="perShekel">0.00</span>
     </div>
 
     <h2>גרף פירעון חודשי (עמודות)</h2>
@@ -125,21 +156,21 @@
     </div>
   </div>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js v3 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
   <script>
   document.addEventListener('DOMContentLoaded',()=>{
     const addRowBtn = document.getElementById('addRow');
     const tbody     = document.getElementById('table-body');
     let chart;
 
-    // פונקציית PMT
+    // פונקציית PMT סטנדרטית
     function pmt(rate,n,pv){
       if(rate===0) return pv/n;
       return (pv*rate)/(1-Math.pow(1+rate,-n));
     }
 
-    // הוספת שורה
+    // הוספת שורה חדשה
     function addRow(){
       const tr = document.createElement('tr');
       tr.innerHTML = `
@@ -159,17 +190,18 @@
       `;
       tbody.appendChild(tr);
 
-      // מאזינים
+      // מאזינים לשינויים
       tr.querySelectorAll('.amount,.years,.rate').forEach(el=>
         el.addEventListener('input', recalc)
       );
       tr.querySelector('.remove').addEventListener('click',()=>{
-        tr.remove(); recalc();
+        tr.remove();
+        recalc();
       });
       recalc();
     }
 
-    // חישוב וסיכום
+    // החישובים וסיכום
     function recalc(){
       const rows = tbody.querySelectorAll('tr');
       let sumP=0, sumM=0, sumC=0, maxMonths=0;
@@ -186,9 +218,12 @@
         tr.querySelector('.monthly').textContent = Math.round(m).toLocaleString();
         tr.querySelector('.total').textContent   = Math.round(cost).toLocaleString();
 
-        sumP += P; sumM += m; sumC += cost;
+        sumP += P;
+        sumM += m;
+        sumC += cost;
         if(n>maxMonths) maxMonths=n;
 
+        // בניית סדרת החזר חודשי
         for(let i=0;i<n;i++){
           monthlySeries[i] = (monthlySeries[i]||0) + m;
         }
@@ -207,23 +242,31 @@
         document.getElementById('chart'),
         {
           type: 'bar',
-          data: { labels, datasets: [{
-            label: 'החזר חודשי מצטבר',
-            data: monthlySeries,
-            backgroundColor: 'var(--gold)'
-          }]},
+          data: {
+            labels,
+            datasets: [{
+              label: 'החזר חודשי מצטבר',
+              data: monthlySeries,
+              backgroundColor: 'var(--gold)'
+            }]
+          },
           options: {
-            responsive:true,
-            scales:{ x:{ title:{display:true,text:'חודש'} },
-                     y:{ title:{display:true,text:'₪'} }}
+            responsive: true,
+            scales: {
+              x: { title:{display:true,text:'חודש'} },
+              y: {
+                beginAtZero:true,
+                title:{display:true,text:'₪'}
+              }
+            }
           }
         }
       );
     }
 
-    // אתחול
+    // אתחול: שתי שורות ברירת מחדל
     addRow(); addRow();
-    addRowBtn.addEventListener('click',addRow);
+    addRowBtn.addEventListener('click', addRow);
   });
   </script>
 </body>
