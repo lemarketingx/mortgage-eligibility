@@ -131,21 +131,24 @@
     const tbody     = document.getElementById('table-body');
     let chart;
 
-    // חישוב תשלום חודשי (PMT)
     function pmt(rate, n, pv) {
       if (rate === 0) return pv / n;
       return (pv * rate) / (1 - Math.pow(1 + rate, -n));
     }
 
-    // הוספת שורה לטבלה
     function addRow() {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>
           <select class="plan">
-            <option>קבועה</option>
-            <option>משתנה</option>
-            <option>פריים</option>
+            <option value="fixed_cpi">קבועה צמודה למדד</option>
+            <option value="fixed_non">קבועה לא צמודה</option>
+            <option value="var5_cpi">משתנה כל 5 שנים צמודה למדד</option>
+            <option value="var1_cpi">משתנה כל שנה צמודה למדד</option>
+            <option value="var5_non">משתנה כל 5 שנים לא צמודה</option>
+            <option value="var1_non">משתנה כל שנה לא צמודה</option>
+            <option value="prime">ריבית פריים</option>
+            <option value="usd">צמודת דולר</option>
           </select>
         </td>
         <td><input class="amount" type="number" min="0" placeholder="₪"></td>
@@ -157,7 +160,6 @@
       `;
       tbody.appendChild(tr);
 
-      // מאזינים לשינוי בנתונים
       tr.querySelectorAll('.amount, .years, .rate').forEach(el =>
         el.addEventListener('input', recalc)
       );
@@ -168,7 +170,6 @@
       recalc();
     }
 
-    // חישוב כולל וסיכום + גרף
     function recalc() {
       const rows = Array.from(tbody.querySelectorAll('tr'));
       let sumP = 0, sumM = 0, sumC = 0, maxMonths = 0;
@@ -191,7 +192,6 @@
         sumC += cost;
         if (n > maxMonths) maxMonths = n;
 
-        // בונים לוח פירעון
         let balance = P;
         for (let i = 0; i < n; i++) {
           const interest = balance * R;
@@ -203,7 +203,6 @@
         }
       });
 
-      // עדכון סיכומים
       document.getElementById('sumP').textContent      = Math.round(sumP).toLocaleString();
       document.getElementById('sumM').textContent      = Math.round(sumM).toLocaleString();
       document.getElementById('sumC').textContent      = Math.round(sumC).toLocaleString();
@@ -211,10 +210,8 @@
         ? (sumC / sumP).toFixed(2)
         : '0.00';
 
-      // הכנת נתוני גרף
       const labels = Array.from({ length: maxMonths }, (_, i) => i + 1);
 
-      // הצגת גרף stacked
       if (chart) chart.destroy();
       chart = new Chart(document.getElementById('chart'), {
         type: 'bar',
@@ -260,7 +257,6 @@
       });
     }
 
-    // אתחול עם שתי שורות
     addRow(); addRow();
     addRowBtn.addEventListener('click', addRow);
   });
