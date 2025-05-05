@@ -8,116 +8,84 @@
   <style>
     :root {
       --gold: #D4AF37;
-      --black: #000;
-      --white: #fff;
-      --gray: #f5f5f5;
+      --dark: #333;
+      --light: #f5f5f5;
+      --red: #e74c3c;
       --radius: 6px;
     }
     * { box-sizing:border-box; margin:0; padding:0 }
     body {
-      font-family:'Heebo',sans-serif;
-      background:var(--gray);
-      color:var(--black);
+      font-family:'Heebo', sans-serif;
+      background:var(--light);
+      color:var(--dark);
       padding:1rem;
     }
     h1,h2 { text-align:center; margin:1rem 0; }
     #calculator {
-      max-width:900px;
-      margin:0 auto;
-      background:var(--white);
-      padding:1rem;
+      max-width:960px; margin:0 auto;
+      background:#fff; padding:1rem;
       border-radius:var(--radius);
-      box-shadow:0 1px 4px rgba(0,0,0,0.1);
+      box-shadow:0 2px 8px rgba(0,0,0,0.1);
     }
     .controls {
-      text-align:right;
-      margin-bottom:.5rem;
+      text-align:right; margin-bottom:.5rem;
     }
     .controls button {
-      padding:.5rem 1rem;
-      margin-left:.3rem;
-      border:none;
-      border-radius:var(--radius);
-      cursor:pointer;
-      background:var(--gold);
-      color:var(--black);
-      font-weight:bold;
+      padding:.5rem 1rem; margin-left:.4rem;
+      border:none; border-radius:var(--radius);
+      cursor:pointer; font-weight:600;
     }
+    .controls .add { background:var(--gold); color:#000; }
     table {
-      width:100%;
-      border-collapse:collapse;
+      width:100%; border-collapse:collapse;
       margin-bottom:1rem;
     }
-    th, td {
-      border:1px solid #ccc;
-      padding:.5rem;
-      text-align:center;
+    th,td {
+      border:1px solid #ddd; padding:.6rem;
+      text-align:center; font-size:.95rem;
     }
     input[type="number"], select {
-      width:100%;
-      padding:.4rem;
-      border:1px solid #ccc;
-      border-radius:var(--radius);
+      width:100%; padding:.4rem;
+      border:1px solid #ccc; border-radius:var(--radius);
+      font-size:.95rem;
     }
     td .monthly, td .total {
-      display:block;
-      padding:.4rem 0;
+      display:block; padding:.4rem 0;
     }
     td button.remove {
-      background:#e74c3c;
-      color:#fff;
-      border:none;
-      border-radius:var(--radius);
-      cursor:pointer;
-      font-size:1rem;
-      line-height:1;
-      width:1.8rem; height:1.8rem;
+      background:var(--red); color:#fff;
+      border:none; border-radius:50%;
+      cursor:pointer; width:1.8rem; height:1.8rem;
+      line-height:1.8rem; font-size:1rem;
     }
-    /* --- סיכום תמהיל --- */
-    .summary-labels {
-      display:grid;
+    .summary-labels, #summary {
+      display:grid; gap:.5rem;
       grid-template-columns: repeat(4,1fr);
-      gap:.5rem;
-      margin-bottom:.3rem;
-    }
-    .summary-labels div {
-      text-align:center;
-      font-weight:600;
-    }
-    #summary {
-      display:grid;
-      grid-template-columns: repeat(4,1fr);
-      gap:.5rem;
       margin-bottom:1rem;
     }
+    .summary-labels div {
+      text-align:center; font-weight:600;
+    }
     #summary span {
-      display:block;
-      padding:.4rem;
-      background:var(--gray);
-      text-align:center;
-      border-radius:var(--radius);
-      font-weight:500;
+      background:var(--light); padding:.6rem;
+      border-radius:var(--radius); text-align:center;
+      font-weight:500; display:block;
     }
-    #chart-container {
-      height:300px;
-      margin-top:1rem;
-    }
+    #chart-container { height:350px; }
     canvas { width:100%!important; height:100%!important; }
     @media(max-width:600px){
-      th, td { font-size:.9rem; }
-      .controls button { width:100%; margin:0 .2rem .5rem 0; }
       .summary-labels, #summary {
-        grid-template-columns: 1fr; text-align:center;
+        grid-template-columns: 1fr;
       }
+      th, td, input, select { font-size:.85rem; }
     }
   </style>
 </head>
 <body>
   <h1>מחשבון תמהיל משכנתא</h1>
   <div id="calculator">
-
     <div class="controls">
-      <button id="addRow">+ הוסף מסלול</button>
+      <button id="addRow" class="add">+ הוסף מסלול</button>
     </div>
 
     <table>
@@ -127,22 +95,21 @@
           <th>סכום (₪)</th>
           <th>תקופה (שנים)</th>
           <th>ריבית (%)</th>
-          <th>החזר חודשי (₪)</th>
-          <th>עלות כוללת (₪)</th>
+          <th>החזר חודשי</th>
+          <th>עלות כוללת</th>
           <th>×</th>
         </tr>
       </thead>
       <tbody id="table-body"></tbody>
     </table>
 
-    <!-- כותרות הסיכום -->
+    <h2>סיכום תמהיל</h2>
     <div class="summary-labels">
       <div>סה"כ קרן</div>
       <div>סה"כ החזר חודשי</div>
       <div>סה"כ עלות</div>
       <div>החזר לכל 1 ₪</div>
     </div>
-    <!-- ערכי הסיכום -->
     <div id="summary">
       <span id="sumP">0</span>
       <span id="sumM">0</span>
@@ -150,7 +117,7 @@
       <span id="perShekel">0.00</span>
     </div>
 
-    <h2>גרף פירעון חודשי (עמודות)</h2>
+    <h2>גרף פירעון חודשי (קרן vs ריבית)</h2>
     <div id="chart-container">
       <canvas id="chart"></canvas>
     </div>
@@ -159,19 +126,19 @@
   <!-- Chart.js v3 -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
   <script>
-  document.addEventListener('DOMContentLoaded',()=>{
+  document.addEventListener('DOMContentLoaded', () => {
     const addRowBtn = document.getElementById('addRow');
     const tbody     = document.getElementById('table-body');
     let chart;
 
-    // פונקציית PMT סטנדרטית
-    function pmt(rate,n,pv){
-      if(rate===0) return pv/n;
-      return (pv*rate)/(1-Math.pow(1+rate,-n));
+    // חישוב תשלום חודשי (PMT)
+    function pmt(rate, n, pv) {
+      if (rate === 0) return pv / n;
+      return (pv * rate) / (1 - Math.pow(1 + rate, -n));
     }
 
-    // הוספת שורה חדשה
-    function addRow(){
+    // הוספת שורה לטבלה
+    function addRow() {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>
@@ -190,30 +157,31 @@
       `;
       tbody.appendChild(tr);
 
-      // מאזינים לשינויים
-      tr.querySelectorAll('.amount,.years,.rate').forEach(el=>
+      // מאזינים לשינוי בנתונים
+      tr.querySelectorAll('.amount, .years, .rate').forEach(el =>
         el.addEventListener('input', recalc)
       );
-      tr.querySelector('.remove').addEventListener('click',()=>{
+      tr.querySelector('.remove').addEventListener('click', () => {
         tr.remove();
         recalc();
       });
       recalc();
     }
 
-    // החישובים וסיכום
-    function recalc(){
-      const rows = tbody.querySelectorAll('tr');
-      let sumP=0, sumM=0, sumC=0, maxMonths=0;
-      const monthlySeries=[];
+    // חישוב כולל וסיכום + גרף
+    function recalc() {
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      let sumP = 0, sumM = 0, sumC = 0, maxMonths = 0;
+      const principalSeries = [];
+      const interestSeries  = [];
 
-      rows.forEach(tr=>{
-        const P = parseFloat(tr.querySelector('.amount').value)||0;
-        const Y = parseFloat(tr.querySelector('.years').value)||0;
-        const R = (parseFloat(tr.querySelector('.rate').value)||0)/100/12;
-        const n = Y*12;
-        const m = pmt(R,n,P);
-        const cost = m*n;
+      rows.forEach(tr => {
+        const P = parseFloat(tr.querySelector('.amount').value) || 0;
+        const Y = parseFloat(tr.querySelector('.years').value)  || 0;
+        const R = (parseFloat(tr.querySelector('.rate').value) || 0) / 100 / 12;
+        const n = Y * 12;
+        const m = pmt(R, n, P);
+        const cost = m * n;
 
         tr.querySelector('.monthly').textContent = Math.round(m).toLocaleString();
         tr.querySelector('.total').textContent   = Math.round(cost).toLocaleString();
@@ -221,50 +189,78 @@
         sumP += P;
         sumM += m;
         sumC += cost;
-        if(n>maxMonths) maxMonths=n;
+        if (n > maxMonths) maxMonths = n;
 
-        // בניית סדרת החזר חודשי
-        for(let i=0;i<n;i++){
-          monthlySeries[i] = (monthlySeries[i]||0) + m;
+        // בונים לוח פירעון
+        let balance = P;
+        for (let i = 0; i < n; i++) {
+          const interest = balance * R;
+          const principal = m - interest;
+          balance -= principal;
+
+          principalSeries[i] = (principalSeries[i] || 0) + principal;
+          interestSeries[i]  = (interestSeries[i]  || 0) + interest;
         }
       });
 
-      // עדכון סיכום
-      document.getElementById('sumP').textContent      = sumP.toLocaleString();
+      // עדכון סיכומים
+      document.getElementById('sumP').textContent      = Math.round(sumP).toLocaleString();
       document.getElementById('sumM').textContent      = Math.round(sumM).toLocaleString();
       document.getElementById('sumC').textContent      = Math.round(sumC).toLocaleString();
-      document.getElementById('perShekel').textContent = (sumP? (sumC/sumP).toFixed(2) : '0.00');
+      document.getElementById('perShekel').textContent = sumP
+        ? (sumC / sumP).toFixed(2)
+        : '0.00';
 
-      // עדכון גרף עמודות
-      const labels = Array.from({length:maxMonths},(_,i)=>i+1);
-      if(chart) chart.destroy();
-      chart = new Chart(
-        document.getElementById('chart'),
-        {
-          type: 'bar',
-          data: {
-            labels,
-            datasets: [{
-              label: 'החזר חודשי מצטבר',
-              data: monthlySeries,
+      // הכנת נתוני גרף
+      const labels = Array.from({ length: maxMonths }, (_, i) => i + 1);
+
+      // הצגת גרף stacked
+      if (chart) chart.destroy();
+      chart = new Chart(document.getElementById('chart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'פרעון קרן',
+              data: principalSeries,
               backgroundColor: 'var(--gold)'
-            }]
-          },
-          options: {
-            responsive: true,
-            scales: {
-              x: { title:{display:true,text:'חודש'} },
-              y: {
-                beginAtZero:true,
-                title:{display:true,text:'₪'}
+            },
+            {
+              label: 'ריבית',
+              data: interestSeries,
+              backgroundColor: 'rgba(200,200,200,0.7)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: ctx => {
+                  const val = ctx.parsed.y;
+                  return ctx.dataset.label + ': ₪' + Math.round(val).toLocaleString();
+                }
               }
+            }
+          },
+          scales: {
+            x: {
+              title: { display: true, text: 'חודש' },
+              stacked: true
+            },
+            y: {
+              title: { display: true, text: '₪' },
+              stacked: true,
+              beginAtZero: true
             }
           }
         }
-      );
+      });
     }
 
-    // אתחול: שתי שורות ברירת מחדל
+    // אתחול עם שתי שורות
     addRow(); addRow();
     addRowBtn.addEventListener('click', addRow);
   });
