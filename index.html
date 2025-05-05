@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>מחשבון משכנתא – מאי פיננסים</title>
 
   <!-- גופנים ואייקונים -->
@@ -11,33 +11,45 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 </head>
 
-<body onload="onload_clear()" dir="rtl">
-  <!-- סיידנב ולוגו עליון -->
+<body dir="rtl">
+  <!-- Top bar & sidenav -->
   <div class="maintop-wrapper">
     <div class="maintop">
       <div class="logo-container">
-        <img src="../x/logo/1703768756.png" alt="לוגו" class="logo">
+        <img src="https://app.Wisecard.co.il/x/logo/1703768756.png"
+             alt="לוגו" class="logo">
       </div>
       <ul id="slide-out" class="sidenav">
-        <li><div class="user-view">
-          <div class="background"></div>
-          <a href="#user"><img class="circle" src="../x/logo/658d74af34ee417037692631312443618.png"></a>
-          <a href="#name"><span class="name">שי אשטמקר</span></a>
-          <a href="#email"><span class="email">mayfn2021@gmail.com</span></a>
-          <a href="#phone"><span class="phone">0508623360</span></a>
-        </div></li>
+        <li>
+          <div class="user-view">
+            <div class="background"></div>
+            <a href="#user">
+              <img class="circle"
+                   src="https://app.Wisecard.co.il/x/logo/658d74af34ee417037692631312443618.png">
+            </a>
+            <a href="#name"><span class="name">שי אשטמקר</span></a>
+            <a href="#email"><span class="email">mayfn2021@gmail.com</span></a>
+            <a href="#phone"><span class="phone">0508623360</span></a>
+          </div>
+        </li>
         <li><div class="divider"></div></li>
         <li><a href="../mayfn" target="_blank"><i class="material-icons">cloud</i>כרטיס הביקור שלנו</a></li>
         <li><div class="divider"></div></li>
         <li><a href="https://www.wisecard.co.il/terms/" target="_blank">תנאי שימוש</a></li>
         <li><a href="https://www.wisecard.co.il/privacy/" target="_blank">מדיניות פרטיות</a></li>
         <li><div class="divider"></div></li>
-        <li><a href="https://Wisecard.co.il" target="_blank"><img src="https://app.Wisecard.co.il/images/wise.png" class="wise-logo"></a></li>
+        <li><a href="https://Wisecard.co.il" target="_blank">
+          <img src="https://app.Wisecard.co.il/images/wise.png"
+               alt="Wise" class="wise-logo">
+        </a></li>
       </ul>
-      <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons menu-icon">menu</i></a>
+      <a href="#" data-target="slide-out" class="sidenav-trigger">
+        <i class="material-icons menu-icon">menu</i>
+      </a>
     </div>
   </div>
 
@@ -46,11 +58,8 @@
     <div id="container">
       <div id="form">
         <div id="imadad">
-          <input
-            id="madad" name="madad" class="imadad"
-            type="text" value="1.5" placeholder="הנחת מדד"
-            onchange="recalc()"
-          />
+          <input id="madad" name="madad" class="imadad"
+                 type="text" value="1.5" placeholder="הנחת מדד">
         </div>
 
         <div id="main">
@@ -80,4 +89,46 @@
     </div>
 
     <!-- פקדי שליטה חיצוניים -->
-    <div class
+    <div class="controls external-controls">
+      <button id="addPlan" class="btn gold">הוסף מסלול</button>
+      <button id="exportPDF" class="btn">ייצא PDF</button>
+      <button id="exportExcel" class="btn">ייצא Excel</button>
+    </div>
+
+    <!-- טופס לידים -->
+    <section id="lead-section">
+      <h2>שמור תמהיל וקבל הצעה</h2>
+      <form id="leadForm">
+        <label for="leadName">שם מלא:</label>
+        <input id="leadName" type="text" required placeholder="ישראל ישראלי">
+        <label for="leadEmail">אימייל:</label>
+        <input id="leadEmail" type="email" required placeholder="example@mail.com">
+        <button type="submit" class="btn gold">שלח לי הצעה</button>
+      </form>
+      <div id="leadMsg" role="alert"></div>
+    </section>
+  </main>
+
+  <!-- ספריות חיצוניות -->
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js">
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+  </script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
+  </script>
+
+  <!-- הקוד המודולרי שלך -->
+  <script type="module" src="script.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      M.Sidenav.init(document.querySelectorAll('.sidenav'));
+    });
+  </script>
+</body>
+</html>
