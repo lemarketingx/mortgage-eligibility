@@ -1,356 +1,83 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-<<<<<<< HEAD
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>מאי פיננסים – מחשבונים</title>
-  <style>
-    :root {
-      --gold: #D4AF37;
-      --black: #000;
-      --white: #fff;
-      --gray: #f5f5f5;
-      --radius: 6px;
-    }
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{
-      font-family:Arial,sans-serif;
-      background:var(--gray);
-      color:var(--black);
-      direction:rtl;
-      text-align:right;
-    }
-    header{
-      background:var(--black);
-      color:var(--white);
-      padding:1rem;
-      text-align:center;
-    }
-    nav{
-      display:flex;
-      justify-content:center;
-      background:var(--gold);
-    }
-    nav button{
-      flex:1;
-      background:none;
-      border:none;
-      padding:1rem;
-      cursor:pointer;
-      font-weight:bold;
-    }
-    nav button.active{
-      background:var(--white);
-      color:var(--black);
-    }
-    section{
-      display:none;
-      max-width:800px;
-      margin:1rem auto;
-      background:var(--white);
-      border-radius:var(--radius);
-      padding:1rem;
-      box-shadow:0 2px 6px rgba(0,0,0,0.1);
-    }
-    section.active{ display:block; }
-    h2{ margin-bottom:1rem; }
-    /* --- לשונית מסלולים --- */
-    table{width:100%;border-collapse:collapse;margin-bottom:0.5rem;}
-    th,td{border:1px solid #ccc;padding:0.5rem;text-align:center;}
-    input,select{width:100%;padding:0.4rem;border:1px solid #ccc;border-radius:var(--radius);}
-    .btn{display:inline-block;margin:0.5rem 0;padding:0.6rem 1rem;border:none;border-radius:var(--radius);cursor:pointer;font-weight:bold;}
-    .btn-gold{background:var(--gold);color:var(--black);}
-    .btn-red{background:#e74c3c;color:#fff;}
-    .summary{background:#f0f0f0;padding:1rem;border-radius:var(--radius);}
-    /* --- לשונית זכאות --- */
-    #tab-elig label{display:block;margin:0.5rem 0 0.2rem;font-weight:bold;}
-    /* --- לשונית הגשה --- */
-    #tab-app label{display:block;margin:0.5rem 0 0.2rem;font-weight:bold;}
-  </style>
-=======
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>מחשבון מסלולי משכנתא – מאי פיננסים</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מחשבון משכנתא – מאי פיננסים</title>
+
+  <!-- גופנים ואייקונים -->
+  <link href="https://fonts.googleapis.com/css?family=Heebo&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="styles.css">
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <!-- SheetJS -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <!-- Google Analytics (GA4) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
-  </script>
->>>>>>> a630792 (יישמתי את השדרוגים: modular CSS/JS, chart, export, localStorage, GA4)
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 </head>
-<body>
-  <header>
-    <h1>מחשבון מסלולי משכנתא</h1>
-  </header>
-<<<<<<< HEAD
-  <nav>
-    <button id="btn-plan" class="active">מסלולי משכנתא</button>
-    <button id="btn-elig">זכאות מסובסדת</button>
-    <button id="btn-app">הגשה דיגיטלית</button>
-  </nav>
 
-  <!-- 1: מסלולים -->
-  <section id="tab-plan" class="active">
-    <h2>מחשבון מסלולי משכנתא</h2>
-    <table id="planTable">
-      <thead>
-        <tr>
-          <th>מסלול</th>
-          <th>סכום (₪)</th>
-          <th>תקופה (שנים)</th>
-          <th>ריבית (% לשנה)</th>
-          <th>החזר חודשי (₪)</th>
-          <th>עלות כוללת (₪)</th>
-          <th>×</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <button id="addPlan" class="btn btn-gold">הוסף מסלול</button>
-    <div id="planSummary" class="summary"></div>
-  </section>
-
-  <!-- 2: זכאות מסובסדת -->
-  <section id="tab-elig">
-    <h2>מחשבון זכאות למשכנתא מסובסדת</h2>
-    <label for="age">גיל (שנים):</label>
-    <input type="number" id="age" placeholder="למשל 35">
-
-    <label for="marriageDate">תאריך נישואין (אם רווק/ה השאר ריק):</label>
-    <input type="date" id="marriageDate">
-
-    <label for="kids">מספר ילדים עד גיל 21:</label>
-    <input type="number" id="kids" value="0">
-
-    <label for="sibs">מספר אחים ואחיות:</label>
-    <input type="number" id="sibs" value="0">
-
-    <label for="svcH">שירות צבאי – בעל (חודשים):</label>
-    <input type="number" id="svcH" value="0">
-=======
+<body onload="onload_clear()" dir="rtl">
+  <!-- סיידנב ולוגו עליון -->
+  <div class="maintop-wrapper">
+    <div class="maintop">
+      <div class="logo-container">
+        <img src="../x/logo/1703768756.png" alt="לוגו" class="logo">
+      </div>
+      <ul id="slide-out" class="sidenav">
+        <li><div class="user-view">
+          <div class="background"></div>
+          <a href="#user"><img class="circle" src="../x/logo/658d74af34ee417037692631312443618.png"></a>
+          <a href="#name"><span class="name">שי אשטמקר</span></a>
+          <a href="#email"><span class="email">mayfn2021@gmail.com</span></a>
+          <a href="#phone"><span class="phone">0508623360</span></a>
+        </div></li>
+        <li><div class="divider"></div></li>
+        <li><a href="../mayfn" target="_blank"><i class="material-icons">cloud</i>כרטיס הביקור שלנו</a></li>
+        <li><div class="divider"></div></li>
+        <li><a href="https://www.wisecard.co.il/terms/" target="_blank">תנאי שימוש</a></li>
+        <li><a href="https://www.wisecard.co.il/privacy/" target="_blank">מדיניות פרטיות</a></li>
+        <li><div class="divider"></div></li>
+        <li><a href="https://Wisecard.co.il" target="_blank"><img src="https://app.Wisecard.co.il/images/wise.png" class="wise-logo"></a></li>
+      </ul>
+      <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons menu-icon">menu</i></a>
+    </div>
+  </div>
 
   <main>
-    <section aria-labelledby="plan-calculator">
-      <h2 id="plan-calculator">מסלולי ריבית</h2>
+    <!-- מחשבון מסלולי משכנתא -->
+    <div id="container">
+      <div id="form">
+        <div id="imadad">
+          <input
+            id="madad" name="madad" class="imadad"
+            type="text" value="1.5" placeholder="הנחת מדד"
+            onchange="recalc()"
+          />
+        </div>
 
-      <div class="table-container" role="region" aria-label="טבלת מסלולי ריבית">
-        <table id="planTable">
-          <caption class="sr-only">מסלולי משכנתא לבחירה</caption>
-          <thead>
-            <tr>
-              <th>מסלול</th>
-              <th>תיאור</th>
-              <th>מאפיינים</th>
-              <th>סיכונים</th>
-              <th>סכום</th>
-              <th>תקופה (שנים)</th>
-              <th>ריבית (%)</th>
-              <th>החזר חודשי</th>
-              <th>עלות כוללת</th>
-              <th>×</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div id="main">
+          <input class="main" disabled placeholder="לוח תשלומים">
+          <input class="mainz" disabled placeholder="מסלול">
+          <input class="main" disabled placeholder="סכום">
+          <input class="main" disabled placeholder="תקופה">
+          <input class="main" disabled placeholder="ריבית">
+          <input class="main" disabled placeholder="החזר חודשי">
+          <input class="main totallabel" disabled placeholder="עלות כוללת">
+        </div>
+
+        <input id="num" type="hidden" value="0">
+        <div id="inputs" dir="rtl"></div>
+
+        <div id="controls">
+          <input id="totalPayment" class="totals" disabled placeholder="סה\"כ חודשי">
+          <input id="totalPrincipal" class="totals" disabled placeholder="סה\"כ קרן">
+          <input id="totalNominal" class="totals" disabled placeholder="סה\"כ עלות">
+          <input id="oneshekel" class="totals" disabled placeholder="החזר לכל 1 שקל">
+        </div>
       </div>
 
-      <div class="controls">
-        <button id="addPlan" class="btn gold">הוסף מסלול</button>
-        <button id="exportPDF" class="btn">ייצא PDF</button>
-        <button id="exportExcel" class="btn">ייצא Excel</button>
+      <div id="form3">
+        <canvas id="chart_payment3" aria-label="גרף פירעון משכנתא" role="img"></canvas>
       </div>
+    </div>
 
-      <div id="planSummary" class="summary" role="region" aria-live="polite"></div>
->>>>>>> a630792 (יישמתי את השדרוגים: modular CSS/JS, chart, export, localStorage, GA4)
-
-      <canvas id="amortChart" aria-label="גרף פירעון משכנתא" role="img"></canvas>
-    </section>
-
-<<<<<<< HEAD
-    <button id="calcElig" class="btn btn-gold">חשב זכאות</button>
-    <div id="eligSummary" class="summary"></div>
-  </section>
-
-  <!-- 3: הגשה דיגיטלית -->
-  <section id="tab-app">
-    <h2>הגשת משכנתא דיגיטלית</h2>
-    <form id="appForm" action="mailto:mayfn2021@gmail.com" method="post" enctype="text/plain">
-      <label for="appName">שם מלא:</label>
-      <input type="text" id="appName" name="שם" required>
-
-      <label for="appPhone">טלפון:</label>
-      <input type="tel" id="appPhone" name="טלפון" required>
-
-      <label for="appEmail">אימייל:</label>
-      <input type="email" id="appEmail" name="אימייל" required>
-
-      <label for="appAmount">סכום משכנתא רצוי (₪):</label>
-      <input type="number" id="appAmount" name="סכום" required>
-
-      <label for="appAddress">כתובת נכס:</label>
-      <input type="text" id="appAddress" name="כתובת" required>
-
-      <label for="appDate">תאריך רכישה:</label>
-      <input type="date" id="appDate" name="תאריך" required>
-
-      <button type="submit" class="btn btn-gold">שלח בקשה</button>
-    </form>
-  </section>
-
-  <script>
-    // ניווט לשוניות
-    ['plan','elig','app'].forEach(tab => {
-      document.getElementById('btn-'+tab).onclick = () => {
-        ['plan','elig','app'].forEach(t => {
-          document.getElementById('btn-'+t).classList.remove('active');
-          document.getElementById('tab-'+t).classList.remove('active');
-        });
-        document.getElementById('btn-'+tab).classList.add('active');
-        document.getElementById('tab-'+tab).classList.add('active');
-      };
-    });
-
-    // --- לשונית מסלולים ---
-    const planTbody = document.querySelector('#planTable tbody');
-    document.getElementById('addPlan').onclick = addPlanRow;
-
-    function addPlanRow() {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><select class="planType">
-          <option value="רגיל">רגיל</option>
-          <option value="צמוד מדד">צמוד מדד</option>
-          <option value="משתנה">משתנה</option>
-        </select></td>
-        <td><input type="number" class="planAmt" value="0"></td>
-        <td><input type="number" class="planTerm" value="20"></td>
-        <td><input type="number" class="planRate" value="2.5" step="0.01"></td>
-        <td class="planPay">0</td>
-        <td class="planCost">0</td>
-        <td><button class="btn btn-red remove">×</button></td>`;
-      planTbody.appendChild(tr);
-
-      tr.querySelector('.remove').onclick = () => {
-        tr.remove();
-        calcPlan();
-      };
-      ['planAmt','planTerm','planRate'].forEach(cls => {
-        tr.querySelector('.'+cls).oninput = calcPlan;
-      });
-      calcPlan();
-    }
-
-    function calcPlan() {
-      let totalP=0, totalM=0, totalCost=0;
-      planTbody.querySelectorAll('tr').forEach(tr => {
-        const P   = +tr.querySelector('.planAmt').value;
-        const yrs = +tr.querySelector('.planTerm').value;
-        const r   = +tr.querySelector('.planRate').value/100/12;
-        const n   = yrs*12;
-        const M   = r>0
-          ? (P*r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1)
-          : P/n;
-        const cost = M*n;
-        tr.querySelector('.planPay').textContent  = M.toFixed(2);
-        tr.querySelector('.planCost').textContent = cost.toFixed(2);
-        totalP   += P;
-        totalM   += M;
-        totalCost+= cost;
-      });
-      document.getElementById('planSummary').innerHTML = `
-        <p>סה"כ קרן: ₪${totalP.toFixed(2)}</p>
-        <p>סה"כ החזר חודשי: ₪${totalM.toFixed(2)}</p>
-        <p>סה"כ עלות: ₪${totalCost.toFixed(2)}</p>`;
-    }
-
-    // --- לשונית זכאות מסובסדת ---
-    document.getElementById('calcElig').onclick = () => {
-      const age  = +document.getElementById('age').value;
-      const md   = document.getElementById('marriageDate').value;
-      const kids = +document.getElementById('kids').value;
-      const sibs = +document.getElementById('sibs').value;
-      const svcH = +document.getElementById('svcH').value;
-      const svcW = +document.getElementById('svcW').value;
-      let summary = '';
-
-      // בדיקת סף גיל לרווקים
-      if (!md && age < 30) {
-        summary = '<p style="color:red">רווקים מתחת לגיל 30 אינם זכאים.</p>';
-        document.getElementById('eligSummary').innerHTML = summary;
-        return;
-      }
-
-      let points = 0;
-      // נישואין
-      if (md) {
-        const years = Math.floor((new Date() - new Date(md)) / (1000*60*60*24*365));
-        points += 250;
-        if (years > 1) points += (years - 1) * 50;
-      }
-      // אחים ואחיות
-      points += sibs * 50;
-      // ילדים
-      if (kids >= 1) {
-        points += 350;
-        if (kids > 1) {
-          const extra = Math.min(kids,4) - 1;
-          points += extra * 150;
-        }
-        if (kids > 4) {
-          points += (kids - 4) * 100;
-        }
-      }
-      // שירות צבאי
-      points += (svcH + svcW) * 10;
-
-      // זכאות והסכום
-      const eligible = points >= 1000;
-      const amount   = Math.floor(points * 100);
-
-      summary += `<p>סה"כ נקודות: <strong>${points}</strong></p>`;
-
-      if (eligible) {
-        summary += `<p style="color:green">
-          מזל טוב! זכאים לקבל עד ₪${amount.toLocaleString()}<br>
-          (100,000 ₪ לכל 1,000 נקודות)
-        </p>`;
-      } else {
-        summary += `<p style="color:red">
-          ייתכן ואינכם עומדים בקריטריונים – חסרות עוד ${1000 - points} נקודות
-        </p>`;
-      }
-
-      document.getElementById('eligSummary').innerHTML = summary;
-    };
-  </script>
-=======
-    <section aria-labelledby="lead-form">
-      <h2 id="lead-form">שמור תמהיל וקבל הצעה</h2>
-      <form id="leadForm">
-        <label for="leadName">שם מלא:</label>
-        <input type="text" id="leadName" required placeholder="ישראל ישראלי">
-
-        <label for="leadEmail">אימייל:</label>
-        <input type="email" id="leadEmail" required placeholder="example@mail.com">
-
-        <button type="submit" class="btn gold">שלח לי הצעה</button>
-      </form>
-      <div id="leadMsg" role="alert"></div>
-    </section>
-  </main>
->>>>>>> a630792 (יישמתי את השדרוגים: modular CSS/JS, chart, export, localStorage, GA4)
-
-  <script type="module" src="script.js"></script>
-</body>
-</html>
+    <!-- פקדי שליטה חיצוניים -->
+    <div class
