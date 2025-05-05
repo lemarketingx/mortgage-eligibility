@@ -2,133 +2,201 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>מחשבון משכנתא – מאי פיננסים</title>
-
-  <!-- גופנים ואייקונים -->
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>מחשבון תמהיל משכנתא</title>
   <link href="https://fonts.googleapis.com/css?family=Heebo&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --gold: #D4AF37;
+      --black: #000;
+      --white: #fff;
+      --gray: #f5f5f5;
+      --radius: 6px;
+    }
+    * { box-sizing: border-box; margin:0; padding:0 }
+    body {
+      font-family:'Heebo',sans-serif;
+      background:var(--gray);
+      color:var(--black);
+      padding:1rem;
+    }
+    h1 { text-align:center; margin-bottom:1rem }
+    .btn {
+      padding:.6rem 1.2rem; border:none; border-radius:var(--radius);
+      cursor:pointer; font-weight:bold; margin:.5rem .3rem .5rem 0;
+    }
+    .btn.gold { background:var(--gold); color:var(--black) }
+    .btn.dark { background:var(--black); color:var(--white) }
+    #calculator { max-width:900px; margin:0 auto; background:var(--white);
+      padding:1rem; border-radius:var(--radius); box-shadow:0 1px 4px rgba(0,0,0,0.1);
+    }
+    #header, .segment, #summary {
+      display:grid; grid-template-columns:
+        2fr 1fr 1fr 1fr 1fr 1fr auto; gap:.5rem; align-items:center;
+      margin-bottom:.5rem;
+    }
+    #header { font-weight:bold; }
+    .segment input, .segment select {
+      padding:.4rem; border:1px solid #ccc; border-radius:var(--radius);
+      width:100%;
+    }
+    .segment button { padding:.3rem .6rem }
+    #segments { margin-bottom:1rem }
+    #summary input {
+      padding:.4rem; border:1px solid #ccc; border-radius:var(--radius);
+      background:var(--gray); text-align:center; font-weight:500;
+    }
+    #chart-container { height:300px; margin-top:1rem }
+  </style>
 </head>
+<body>
+  <h1>מחשבון תמהיל משכנתא</h1>
+  <div id="calculator">
+    <div style="text-align:right; margin-bottom:.5rem">
+      <button id="addSegment" class="btn gold">+ הוסף מסלול</button>
+      <button id="exportPDF" class="btn dark">ייצא PDF</button>
+      <button id="exportExcel" class="btn dark">ייצא Excel</button>
+    </div>
 
-<body dir="rtl">
-  <!-- Top bar & sidenav -->
-  <div class="maintop-wrapper">
-    <div class="maintop">
-      <div class="logo-container">
-        <img src="https://app.Wisecard.co.il/x/logo/1703768756.png"
-             alt="לוגו" class="logo">
-      </div>
-      <ul id="slide-out" class="sidenav">
-        <li>
-          <div class="user-view">
-            <div class="background"></div>
-            <a href="#user">
-              <img class="circle"
-                   src="https://app.Wisecard.co.il/x/logo/658d74af34ee417037692631312443618.png">
-            </a>
-            <a href="#name"><span class="name">שי אשטמקר</span></a>
-            <a href="#email"><span class="email">mayfn2021@gmail.com</span></a>
-            <a href="#phone"><span class="phone">0508623360</span></a>
-          </div>
-        </li>
-        <li><div class="divider"></div></li>
-        <li><a href="../mayfn" target="_blank"><i class="material-icons">cloud</i>כרטיס הביקור שלנו</a></li>
-        <li><div class="divider"></div></li>
-        <li><a href="https://www.wisecard.co.il/terms/" target="_blank">תנאי שימוש</a></li>
-        <li><a href="https://www.wisecard.co.il/privacy/" target="_blank">מדיניות פרטיות</a></li>
-        <li><div class="divider"></div></li>
-        <li><a href="https://Wisecard.co.il" target="_blank">
-          <img src="https://app.Wisecard.co.il/images/wise.png"
-               alt="Wise" class="wise-logo">
-        </a></li>
-      </ul>
-      <a href="#" data-target="slide-out" class="sidenav-trigger">
-        <i class="material-icons menu-icon">menu</i>
-      </a>
+    <div id="header">
+      <div>מסלול</div><div>סכום</div><div>תקופה (שנים)</div>
+      <div>ריבית (%)</div><div>החזר חודשי</div><div>עלות כוללת</div><div>×</div>
+    </div>
+    <div id="segments"></div>
+
+    <div id="summary">
+      <input id="totalPrincipal"    placeholder="סה״כ קרן">
+      <input id="totalMonthly"      placeholder="סה״כ החזר חודשי">
+      <input id="totalCost"         placeholder="סה״כ עלות">
+      <input id="paymentPerShekel"  placeholder="החזר לכל 1 ₪">
+    </div>
+
+    <div id="chart-container">
+      <canvas id="amortChart"></canvas>
     </div>
   </div>
 
-  <main>
-    <!-- מחשבון מסלולי משכנתא -->
-    <div id="container">
-      <div id="form">
-        <div id="imadad">
-          <input id="madad" name="madad" class="imadad"
-                 type="text" value="1.5" placeholder="הנחת מדד">
-        </div>
-
-        <div id="main">
-          <input class="main" disabled placeholder="לוח תשלומים">
-          <input class="mainz" disabled placeholder="מסלול">
-          <input class="main" disabled placeholder="סכום">
-          <input class="main" disabled placeholder="תקופה">
-          <input class="main" disabled placeholder="ריבית">
-          <input class="main" disabled placeholder="החזר חודשי">
-          <input class="main totallabel" disabled placeholder="עלות כוללת">
-        </div>
-
-        <input id="num" type="hidden" value="0">
-        <div id="inputs" dir="rtl"></div>
-
-        <div id="controls">
-          <input id="totalPayment" class="totals" disabled placeholder="סה\"כ חודשי">
-          <input id="totalPrincipal" class="totals" disabled placeholder="סה\"כ קרן">
-          <input id="totalNominal" class="totals" disabled placeholder="סה\"כ עלות">
-          <input id="oneshekel" class="totals" disabled placeholder="החזר לכל 1 שקל">
-        </div>
-      </div>
-
-      <div id="form3">
-        <canvas id="chart_payment3" aria-label="גרף פירעון משכנתא" role="img"></canvas>
-      </div>
-    </div>
-
-    <!-- פקדי שליטה חיצוניים -->
-    <div class="controls external-controls">
-      <button id="addPlan" class="btn gold">הוסף מסלול</button>
-      <button id="exportPDF" class="btn">ייצא PDF</button>
-      <button id="exportExcel" class="btn">ייצא Excel</button>
-    </div>
-
-    <!-- טופס לידים -->
-    <section id="lead-section">
-      <h2>שמור תמהיל וקבל הצעה</h2>
-      <form id="leadForm">
-        <label for="leadName">שם מלא:</label>
-        <input id="leadName" type="text" required placeholder="ישראל ישראלי">
-        <label for="leadEmail">אימייל:</label>
-        <input id="leadEmail" type="email" required placeholder="example@mail.com">
-        <button type="submit" class="btn gold">שלח לי הצעה</button>
-      </form>
-      <div id="leadMsg" role="alert"></div>
-    </section>
-  </main>
-
-  <!-- ספריות חיצוניות -->
-  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js">
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
-  </script>
-  <script
-    src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
-  </script>
-
-  <!-- הקוד המודולרי שלך -->
-  <script type="module" src="script.js"></script>
-
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      M.Sidenav.init(document.querySelectorAll('.sidenav'));
+  (() => {
+    // Helpers
+    const fmt = x => x.toLocaleString('he-IL',{minimumFractionDigits:0});
+    const segmentsEl = $('#segments');
+    let chart;
+
+    // Add new segment row
+    function addSegment() {
+      const idx = segmentsEl.children().length + 1;
+      const row = $(`
+        <div class="segment">
+          <select class="type">
+            <option value="fixed">ריבית קבועה</option>
+            <option value="variable">ריבית משתנה</option>
+            <option value="prime">פריים</option>
+          </select>
+          <input type="text" class="princ" placeholder="₪">
+          <input type="number" class="term" placeholder="שנים">
+          <input type="number" class="rate" placeholder="%">
+          <input type="text" class="monthly" disabled>
+          <input type="text" class="cost" disabled>
+          <button type="button" class="remove-btn">×</button>
+        </div>`);
+      segmentsEl.append(row);
+      row.find('.princ,.term,.rate').on('input', recalc);
+      row.find('.remove-btn').on('click', () => { row.remove(); recalc() });
+    }
+
+    // Main calculation
+    function recalc() {
+      const allMonthly = [], allCost = [];
+      let totP=0, totM=0, totC=0, maxMonths=0;
+      $('.segment').each((i,el)=>{
+        const $el = $(el);
+        const P = parseFloat($el.find('.princ').val().replace(/,/g,''))||0;
+        const years = parseFloat($el.find('.term').val())||0;
+        const rAnnual = parseFloat($el.find('.rate').val())||0;
+        const n = years*12;
+        const r = rAnnual/100/12;
+        const monthly = r>0
+          ? (P*r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1)
+          : (n>0?P/n:0);
+        const cost = monthly * n;
+        $el.find('.monthly').val(fmt(monthly));
+        $el.find('.cost').val(fmt(cost));
+        totP += P; totM += monthly; totC += cost;
+        if(n>maxMonths) maxMonths=n;
+        // build series
+        const cum = Array.from({length:n+1},(_,m)=>monthly*(m));
+        allMonthly.push(cum);
+      });
+      $('#totalPrincipal').val(fmt(totP));
+      $('#totalMonthly').val(fmt(totM));
+      $('#totalCost').val(fmt(totC));
+      $('#paymentPerShekel').val((totC/totP||0).toFixed(2));
+
+      // chart data: sum of monthly payments each month
+      const labels = Array.from({length:maxMonths},(_,i)=>i+1);
+      const sums = labels.map((_,m) =>
+        allMonthly.reduce((s,arr)=> s + (arr[m]||0), 0)
+      );
+      if(chart) chart.destroy();
+      chart = new Chart($('#amortChart'),{
+        type:'line',
+        data:{labels,sums: {label:'החזר חודשי כולל',data:sums,fill:false,borderColor:'#D4AF37'}},
+        options:{responsive:true, scales:{x:{title:{display:true,text:'חודש'}},y:{title:{display:true,text:'₪'}}}}
+      });
+    }
+
+    // Export PDF
+    $('#exportPDF').click(()=>{
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text('תמהיל משכנתא',10,10);
+      // build table
+      const body = [];
+      $('.segment').each((i,el)=>{
+        const $el=$(el);
+        body.push([
+          $el.find('.type').val(),
+          $el.find('.princ').val(),
+          $el.find('.term').val(),
+          $el.find('.rate').val(),
+          $el.find('.monthly').val(),
+          $el.find('.cost').val()
+        ]);
+      });
+      doc.autoTable({ head:[['מסלול','סכום','תקופה','ריבית','החזר חודשי','עלות']] , body, startY:20 });
+      doc.save('mortgage_mix.pdf');
     });
+
+    // Export Excel
+    $('#exportExcel').click(()=>{
+      const wb = XLSX.utils.book_new();
+      const data = [['מסלול','סכום','תקופה','ריבית','החזר חודשי','עלות']];
+      $('.segment').each((i,el)=>{
+        const $el=$(el);
+        data.push([
+          $el.find('.type').val(),
+          $el.find('.princ').val(),
+          $el.find('.term').val(),
+          $el.find('.rate').val(),
+          $el.find('.monthly').val(),
+          $el.find('.cost').val()
+        ]);
+      });
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      XLSX.utils.book_append_sheet(wb,ws,'Sheet1');
+      XLSX.writeFile(wb,'mortgage_mix.xlsx');
+    });
+
+    // init
+    $('#addSegment').on('click', addSegment);
+    addSegment(); addSegment(); // שתי שורות כברירת מחדל
+    recalc();
+  })();
   </script>
 </body>
 </html>
