@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>יועץ משכנתאות - בדיקת זכאות</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 4px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .eligible { background-color: #d4edda; color: #155724; }
+    .not-eligible { background-color: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>בדיקת זכאות למשכנתא</h1>
+    <form id="eligibility-form">
+      <label for="salary">שכר חודשי (ש"ח):</label>
+      <input type="number" id="salary" name="salary" required>
+
+      <label for="existing-loans">סך הלוואות חודשיות (ש"ח):</label>
+      <input type="number" id="existing-loans" name="existing-loans" required>
+
+      <label for="desired-mortgage">שווי משכנתא רצוי (ש"ח):</label>
+      <input type="number" id="desired-mortgage" name="desired-mortgage" required>
+
+      <button type="submit">חשב זכאות</button>
+    </form>
+    <div id="result" class="result" style="display:none;"></div>
+  </div>
+
+  <script>
+    document.getElementById('eligibility-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const salary = parseFloat(document.getElementById('salary').value);
+      const loans = parseFloat(document.getElementById('existing-loans').value);
+      const desired = parseFloat(document.getElementById('desired-mortgage').value);
+
+      // חישוב יחס חוב להכנסה (DTI)
+      const monthlyMortgagePayment = (desired * 0.05) / 12; // הנחה של ריבית 5% לשנה
+      const totalObligations = loans + monthlyMortgagePayment;
+      const dti = (totalObligations / salary) * 100;
+
+      const resultEl = document.getElementById('result');
+      resultEl.style.display = 'block';
+
+      if (dti <= 50) {
+        resultEl.textContent = `אתה זכאי! יחס הלוואות לעומת שכר: ${dti.toFixed(1)}%`;
+        resultEl.className = 'result eligible';
+      } else {
+        resultEl.textContent = `לא זכאי. יחס הלוואות לעומת שכר גבוה מדי: ${dti.toFixed(1)}%`;
+        resultEl.className = 'result not-eligible';
+      }
+    });
+  </script>
+</body>
+</html>
