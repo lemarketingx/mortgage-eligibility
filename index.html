@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
+<<<<<<< HEAD
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>מאי פיננסים – מחשבונים</title>
@@ -67,12 +68,32 @@
     /* --- לשונית הגשה --- */
     #tab-app label{display:block;margin:0.5rem 0 0.2rem;font-weight:bold;}
   </style>
+=======
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>מחשבון מסלולי משכנתא – מאי פיננסים</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- SheetJS -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+>>>>>>> a630792 (יישמתי את השדרוגים: modular CSS/JS, chart, export, localStorage, GA4)
 </head>
 <body>
-
   <header>
-    <h1>מאי פיננסים – מחשבונים</h1>
+    <h1>מחשבון מסלולי משכנתא</h1>
   </header>
+<<<<<<< HEAD
   <nav>
     <button id="btn-plan" class="active">מסלולי משכנתא</button>
     <button id="btn-elig">זכאות מסובסדת</button>
@@ -117,10 +138,46 @@
 
     <label for="svcH">שירות צבאי – בעל (חודשים):</label>
     <input type="number" id="svcH" value="0">
+=======
 
-    <label for="svcW">שירות צבאי – אשה (חודשים):</label>
-    <input type="number" id="svcW" value="0">
+  <main>
+    <section aria-labelledby="plan-calculator">
+      <h2 id="plan-calculator">מסלולי ריבית</h2>
 
+      <div class="table-container" role="region" aria-label="טבלת מסלולי ריבית">
+        <table id="planTable">
+          <caption class="sr-only">מסלולי משכנתא לבחירה</caption>
+          <thead>
+            <tr>
+              <th>מסלול</th>
+              <th>תיאור</th>
+              <th>מאפיינים</th>
+              <th>סיכונים</th>
+              <th>סכום</th>
+              <th>תקופה (שנים)</th>
+              <th>ריבית (%)</th>
+              <th>החזר חודשי</th>
+              <th>עלות כוללת</th>
+              <th>×</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="controls">
+        <button id="addPlan" class="btn gold">הוסף מסלול</button>
+        <button id="exportPDF" class="btn">ייצא PDF</button>
+        <button id="exportExcel" class="btn">ייצא Excel</button>
+      </div>
+
+      <div id="planSummary" class="summary" role="region" aria-live="polite"></div>
+>>>>>>> a630792 (יישמתי את השדרוגים: modular CSS/JS, chart, export, localStorage, GA4)
+
+      <canvas id="amortChart" aria-label="גרף פירעון משכנתא" role="img"></canvas>
+    </section>
+
+<<<<<<< HEAD
     <button id="calcElig" class="btn btn-gold">חשב זכאות</button>
     <div id="eligSummary" class="summary"></div>
   </section>
@@ -277,6 +334,23 @@
       document.getElementById('eligSummary').innerHTML = summary;
     };
   </script>
+=======
+    <section aria-labelledby="lead-form">
+      <h2 id="lead-form">שמור תמהיל וקבל הצעה</h2>
+      <form id="leadForm">
+        <label for="leadName">שם מלא:</label>
+        <input type="text" id="leadName" required placeholder="ישראל ישראלי">
 
+        <label for="leadEmail">אימייל:</label>
+        <input type="email" id="leadEmail" required placeholder="example@mail.com">
+
+        <button type="submit" class="btn gold">שלח לי הצעה</button>
+      </form>
+      <div id="leadMsg" role="alert"></div>
+    </section>
+  </main>
+>>>>>>> a630792 (יישמתי את השדרוגים: modular CSS/JS, chart, export, localStorage, GA4)
+
+  <script type="module" src="script.js"></script>
 </body>
 </html>
