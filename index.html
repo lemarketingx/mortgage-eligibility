@@ -1,106 +1,142 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>יועץ משכנתאות - בדיקת זכאות</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>בדיקת זכאות למשכנתא</title>
   <style>
+    :root {
+      --primary: #2c3e50;
+      --accent: #e67e22;
+      --bg: #ecf0f1;
+      --white: #ffffff;
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background: #fff;
+      background: var(--bg);
+      color: var(--primary);
+      line-height: 1.6;
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      max-width: 400px;
-      width: 100%;
     }
-    h1 {
+    header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 2rem;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      color: var(--primary);
+    }
+    main {
+      max-width: 480px;
+      margin: 0 auto;
+      background: var(--white);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    form {
+      display: grid;
+      gap: 1rem;
     }
     label {
+      font-weight: bold;
       display: block;
-      margin-top: 10px;
+      margin-bottom: 0.3rem;
     }
     input[type="number"] {
       width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
+      padding: 0.6rem;
+      border: 1px solid #bdc3c7;
+      border-radius: var(--radius);
+      font-size: 1rem;
     }
     button {
-      width: 100%;
-      padding: 10px;
-      background-color: #007bff;
-      color: white;
+      background: var(--accent);
       border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      margin-top: 20px;
+      color: var(--white);
+      padding: 0.8rem;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: var(--radius);
       cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: darken(var(--accent), 10%);
     }
     .result {
-      margin-top: 20px;
-      padding: 10px;
-      border-radius: 4px;
-      text-align: center;
-      font-weight: bold;
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+      font-size: 1.1rem;
     }
-    .eligible { background-color: #d4edda; color: #155724; }
-    .not-eligible { background-color: #f8d7da; color: #721c24; }
+    .eligible {
+      border-left: 5px solid #27ae60;
+      background: #eafaf1;
+    }
+    .not-eligible {
+      border-left: 5px solid #c0392b;
+      background: #fdecea;
+    }
+    @media (max-width: 500px) {
+      header h1 { font-size: 2rem; }
+      main { padding: 1rem; }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
+  <header>
     <h1>בדיקת זכאות למשכנתא</h1>
-    <form id="eligibility-form">
-      <label for="salary">שכר חודשי (ש"ח):</label>
-      <input type="number" id="salary" name="salary" required>
-
-      <label for="existing-loans">סך הלוואות חודשיות (ש"ח):</label>
-      <input type="number" id="existing-loans" name="existing-loans" required>
-
-      <label for="desired-mortgage">שווי משכנתא רצוי (ש"ח):</label>
-      <input type="number" id="desired-mortgage" name="desired-mortgage" required>
-
+    <p>חשב את יחס החוב להכנסה שלך בלחיצה אחת</p>
+  </header>
+  <main>
+    <form id="mortgageForm">
+      <div>
+        <label for="income">שכר חודשי (₪):</label>
+        <input type="number" id="income" placeholder="למשל 10,000" required>
+      </div>
+      <div>
+        <label for="debts">תשלומי החוב החודשיים (₪):</label>
+        <input type="number" id="debts" placeholder="למשל 2,000" required>
+      </div>
+      <div>
+        <label for="principal">סכום משכנתא רצוי (₪):</label>
+        <input type="number" id="principal" placeholder="למשל 800,000" required>
+      </div>
+      <div>
+        <label for="rate">ריבית שנתית (%):</label>
+        <input type="number" id="rate" step="0.01" value="5" required>
+      </div>
+      <div>
+        <label for="term">משך ההלוואה (שנים):</label>
+        <input type="number" id="term" value="20" required>
+      </div>
       <button type="submit">חשב זכאות</button>
     </form>
     <div id="result" class="result" style="display:none;"></div>
-  </div>
+  </main>
 
   <script>
-    document.getElementById('eligibility-form').addEventListener('submit', function(e) {
+    document.getElementById('mortgageForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const salary = parseFloat(document.getElementById('salary').value);
-      const loans = parseFloat(document.getElementById('existing-loans').value);
-      const desired = parseFloat(document.getElementById('desired-mortgage').value);
+      const income = parseFloat(document.getElementById('income').value);
+      const debts = parseFloat(document.getElementById('debts').value);
+      const P = parseFloat(document.getElementById('principal').value);
+      const annualRate = parseFloat(document.getElementById('rate').value) / 100;
+      const years = parseFloat(document.getElementById('term').value);
 
-      // חישוב יחס חוב להכנסה (DTI)
-      const monthlyMortgagePayment = (desired * 0.05) / 12; // הנחה של ריבית 5% לשנה
-      const totalObligations = loans + monthlyMortgagePayment;
-      const dti = (totalObligations / salary) * 100;
+      // חישוב תשלום חודשי אמורטיזציה
+      const r = annualRate / 12;
+      const n = years * 12;
+      const M = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+
+      const dti = ((debts + M) / income) * 100;
+      const threshold = 50;
 
       const resultEl = document.getElementById('result');
       resultEl.style.display = 'block';
-
-      if (dti <= 50) {
-        resultEl.textContent = `אתה זכאי! יחס הלוואות לעומת שכר: ${dti.toFixed(1)}%`;
-        resultEl.className = 'result eligible';
-      } else {
-        resultEl.textContent = `לא זכאי. יחס הלוואות לעומת שכר גבוה מדי: ${dti.toFixed(1)}%`;
-        resultEl.className = 'result not-eligible';
-      }
-    });
-  </script>
-</body>
-</html>
+      resultEl.className = '
