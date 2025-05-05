@@ -3,181 +3,252 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>מאי פיננסים – ייעוץ משכנתאות</title>
+  <title>מאי פיננסים – מחשבונים</title>
   <style>
     :root {
-      --primary: #000000;
-      --accent: #D4AF37;
-      --bg: #FFFFFF;
-      --text: #333333;
+      --gold: #D4AF37;
+      --black: #000;
+      --white: #fff;
+      --gray: #f5f5f5;
       --radius: 6px;
     }
-    * { box-sizing: border-box; margin:0; padding:0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      background: var(--gray);
+      color: var(--black);
       direction: rtl;
       text-align: right;
     }
-    a { color: var(--accent); text-decoration: none; }
     header {
-      background: var(--primary);
-      color: var(--bg);
+      background: var(--black);
+      color: var(--white);
       padding: 1rem;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 1.8rem;
-      color: var(--accent);
-    }
-    header p {
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
+      text-align: center;
     }
     nav {
-      margin-top: 1rem;
-    }
-    nav ul {
       display: flex;
-      flex-wrap: wrap;
-      list-style: none;
-      gap: 1rem;
-      padding: 0;
+      justify-content: center;
+      background: var(--gold);
     }
-    nav ul li a {
-      color: var(--bg);
+    nav button {
+      background: none;
+      border: none;
+      color: var(--black);
+      padding: 1rem 2rem;
+      cursor: pointer;
       font-weight: bold;
-      font-size: 0.95rem;
     }
-    main {
-      max-width: 900px;
-      margin: 2rem auto;
-      padding: 0 1rem;
+    nav button.active {
+      background: var(--white);
     }
     section {
-      margin-bottom: 3rem;
-      padding: 1.5rem;
-      background: var(--bg);
+      display: none;
+      padding: 1rem;
+      max-width: 800px;
+      margin: 1rem auto;
+      background: var(--white);
       border-radius: var(--radius);
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    section h2 {
-      margin-bottom: 1rem;
-      color: var(--primary);
-      font-size: 1.4rem;
-    }
-    iframe {
-      width: 100%;
+    section.active { display: block; }
+    h2 { margin-bottom: 1rem; }
+    /* ---- לשונית מסלולים ---- */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: center; }
+    input, select { width: 100%; padding: 0.4rem; border: 1px solid #ccc; border-radius: var(--radius); }
+    button.calc, button.remove {
+      padding: 0.5rem 1rem;
       border: none;
       border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: bold;
     }
-    .small-note {
-      margin-top: 0.5rem;
-      font-size: 0.85rem;
-      color: #666;
+    button.calc {
+      background: var(--gold);
+      color: var(--black);
+      margin-top: 1rem;
     }
-    blockquote {
-      margin: 1rem 0;
-      padding: 0.8rem 1rem;
-      border-right: 4px solid var(--accent);
-      background: #f9f9f9;
-      font-style: italic;
+    button.remove {
+      background: #e74c3c;
+      color: #fff;
     }
-    footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.8rem;
-      color: #777;
-      border-top: 1px solid #eee;
-    }
-    @media (max-width: 600px) {
-      header h1 { font-size: 1.5rem; }
-      nav ul { justify-content: center; }
-    }
+    .summary { margin-top: 1rem; background: #eee; padding: 1rem; border-radius: var(--radius); }
+    /* ---- לשונית זכאות ---- */
+    section#tab-elig label { display: block; margin: 0.5rem 0 0.2rem; font-weight: bold; }
+    /* ---- לשונית הגשה ---- */
+    section#tab-app label { display: block; margin: 0.5rem 0 0.2rem; font-weight: bold; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>ייעוץ משכנתאות ופיננסים</h1>
-    <p>חייגו <strong>6629*</strong> | <a href="https://wa.link/">וואטסאפ</a> | <a href="mailto:mayfn2021@gmail.com">mayfn2021@gmail.com</a></p>
-    <nav>
-      <ul>
-        <li><a href="#about">אודות החברה</a></li>
-        <li><a href="#apply">הגשת בקשה</a></li>
-        <li><a href="#eligibility">מחשבון זכאות</a></li>
-        <li><a href="#calculator">מחשבון משכנתא</a></li>
-        <li><a href="#testimonials">המלצות</a></li>
-        <li><a href="#contact">כתבו הודעה</a></li>
-      </ul>
-    </nav>
+    <h1>מאי פיננסים – מחשבונים</h1>
   </header>
 
-  <main>
+  <nav>
+    <button id="btn-plan" class="active">מחשבון מסלולים</button>
+    <button id="btn-elig">מחשבון זכאות</button>
+    <button id="btn-app">הגשה דיגיטלית</button>
+  </nav>
 
-    <!-- אודות החברה -->
-    <section id="about">
-      <h2>אודות החברה</h2>
-      <p>
-        חברת מאי פיננסים מעניקה שירותי ייעוץ פיננסים וליווי בתהליך לקיחת המשכנתא.  
-        תהליך לקיחת המשכנתא יכול להיות מורכב מאוד ומתסכל, ולעתים מסתכם בהפסד של עשרות אלפי שקלים לכל תקופת המשכנתא.  
-        אצלנו מקבלים ליווי מלא מהרגע הראשון של החלום על הבית ועד לסיום חתימת ההסכם – בצורה קלה ובטוחה.  
-      </p>
-      <p class="small-note">מקור: כרטיס ביקור דיגיטלי WISE של מאי פיננסים :contentReference[oaicite:0]{index=0}</p>
-    </section>
+  <!-- לשונית 1: מסלולים -->
+  <section id="tab-plan" class="active">
+    <h2>מחשבון מסלולי משכנתא</h2>
+    <table id="planTable">
+      <thead>
+        <tr>
+          <th>מסלול</th>
+          <th>סכום (₪)</th>
+          <th>תקופה (שנים)</th>
+          <th>ריבית (% לשנה)</th>
+          <th>החזר חודשי (₪)</th>
+          <th>עלות כוללת (₪)</th>
+          <th>הסר</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button id="addPlan" class="calc">הוסף מסלול</button>
+    <div id="planSummary" class="summary"></div>
+  </section>
 
-    <!-- הגשת בקשה דיגיטלית -->
-    <section id="apply">
-      <h2>הגשת בקשת משכנתא דיגיטלית</h2>
-      <iframe src="https://app.wisecard.co.il/landpagemortgage/mayfn" style="min-height:800px;"></iframe>  
-      <p class="small-note">מקור: WISE Digital Application :contentReference[oaicite:1]{index=1}</p>
-    </section>
+  <!-- לשונית 2: זכאות -->
+  <section id="tab-elig">
+    <h2>מחשבון זכאות לנקודות</h2>
+    <label for="marriageDate">תאריך נישואין:</label>
+    <input type="date" id="marriageDate">
 
-    <!-- מחשבון זכאות -->
-    <section id="eligibility">
-      <h2>מחשבון זכאות</h2>
-      <iframe src="https://app.wisecard.co.il/zakaut/mayfn" style="min-height:800px;"></iframe>  
-      <p class="small-note">מקור: WISE Eligibility Calculator :contentReference[oaicite:2]{index=2}</p>
-    </section>
+    <label for="svcH">שירות צבאי – בעל (חודשים):</label>
+    <input type="number" id="svcH" value="0">
 
-    <!-- מחשבון משכנתא -->
-    <section id="calculator">
-      <h2>מחשבון משכנתא</h2>
-      <iframe src="https://app.wisecard.co.il/calc/mayfn" style="min-height:600px;"></iframe>  
-      <p class="small-note">מקור: WISE Mortgage Calculator :contentReference[oaicite:3]{index=3}</p>
-    </section>
+    <label for="svcW">שירות צבאי – אשה (חודשים):</label>
+    <input type="number" id="svcW" value="0">
 
-    <!-- המלצות -->
-    <section id="testimonials">
-      <h2>לקוחות ממליצים</h2>
-      <blockquote>“ממליצה בחום על שי כיועץ משכנתאות, שי אדם מקצועי אשר שם את אינטרס הלקוח בעדיפות עליונה...” – Vered Abitbul :contentReference[oaicite:4]{index=4}</blockquote>
-      <blockquote>“שי התותח, ליווה אותנו בתהליך וקיבלנו את התנאים הטובים ביותר...” – Shlomi Abergel :contentReference[oaicite:5]{index=5}</blockquote>
-    </section>
+    <label for="kids">מספר ילדים (עד גיל 21):</label>
+    <input type="number" id="kids" value="0">
 
-    <!-- כתבו הודעה -->
-    <section id="contact">
-      <h2>כתבו הודעה</h2>
-      <form action="mailto:mayfn2021@gmail.com" method="post" enctype="text/plain">
-        <label for="name">שם מלא:</label>
-        <input type="text" id="name" name="שם" required>
+    <label for="sibH">מספר אחים לבעל:</label>
+    <input type="number" id="sibH" value="0">
 
-        <label for="email">אימייל:</label>
-        <input type="email" id="email" name="אימייל" required>
+    <label for="sibW">מספר אחים לאשה:</label>
+    <input type="number" id="sibW" value="0">
 
-        <label for="message">הודעה:</label>
-        <textarea id="message" name="הודעה" rows="4"></textarea>
+    <button id="calcElig" class="calc">חשב זכאות</button>
+    <div id="eligSummary" class="summary"></div>
+  </section>
 
-        <button type="submit">שלח</button>
-      </form>
-      <p class="small-note">או חייגו: <strong>6629*</strong></p>
-    </section>
+  <!-- לשונית 3: הגשה -->
+  <section id="tab-app">
+    <h2>הגשת משכנתא דיגיטלית</h2>
+    <form id="appForm" action="mailto:mayfn2021@gmail.com" method="post" enctype="text/plain">
+      <label for="appName">שם מלא:</label>
+      <input type="text" id="appName" name="שם">
 
-  </main>
+      <label for="appPhone">טלפון:</label>
+      <input type="tel" id="appPhone" name="טלפון">
 
-  <footer>
-    <p>&copy; 2025 מאי פיננסים – ייעוץ משכנתאות</p>
-  </footer>
+      <label for="appEmail">אימייל:</label>
+      <input type="email" id="appEmail" name="אימייל">
+
+      <label for="appAmount">סכום משכנתא רצוי (₪):</label>
+      <input type="number" id="appAmount" name="סכום">
+
+      <label for="appAddress">כתובת נכס:</label>
+      <input type="text" id="appAddress" name="כתובת">
+
+      <label for="appDate">תאריך רכישה:</label>
+      <input type="date" id="appDate" name="תאריך">
+
+      <button type="submit" class="calc">שלח בקשה</button>
+    </form>
+  </section>
+
+  <script>
+    // ניווט בין לשוניות
+    ['plan','elig','app'].forEach(tab=>{
+      document.getElementById('btn-'+tab).onclick = () => {
+        ['plan','elig','app'].forEach(t=>{
+          document.getElementById('tab-'+t).classList.remove('active');
+          document.getElementById('btn-'+t).classList.remove('active');
+        });
+        document.getElementById('tab-'+tab).classList.add('active');
+        document.getElementById('btn-'+tab).classList.add('active');
+      };
+    });
+
+    // ---- מחשבון מסלולים ----
+    const planTbody = document.querySelector('#planTable tbody');
+    document.getElementById('addPlan').onclick = addPlanRow;
+
+    function addPlanRow(){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>
+          <select class="planType">
+            <option>רגיל</option>
+            <option>צמוד</option>
+            <option>משתנה</option>
+          </select>
+        </td>
+        <td><input type="number" class="planAmt" value="0"></td>
+        <td><input type="number" class="planTerm" value="20"></td>
+        <td><input type="number" class="planRate" value="3.5" step="0.01"></td>
+        <td class="planPay">0</td>
+        <td class="planCost">0</td>
+        <td><button class="remove">×</button></td>`;
+      planTbody.appendChild(tr);
+      tr.querySelector('.remove').onclick = () => { tr.remove(); calcPlan(); };
+      ['planAmt','planTerm','planRate'].forEach(cls=>{
+        tr.querySelector('.'+cls).oninput = calcPlan;
+      });
+      calcPlan();
+    }
+
+    function calcPlan(){
+      let totalP=0, totalM=0, totalCost=0;
+      planTbody.querySelectorAll('tr').forEach(tr=>{
+        const P = +tr.querySelector('.planAmt').value;
+        const yrs = +tr.querySelector('.planTerm').value;
+        const r = +tr.querySelector('.planRate').value/100/12;
+        const n = yrs*12;
+        const M = r>0 ? (P*r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1) : P/n;
+        const cost = M*n;
+        tr.querySelector('.planPay').textContent = M.toFixed(2);
+        tr.querySelector('.planCost').textContent = cost.toFixed(2);
+        totalP += P; totalM += M; totalCost += cost;
+      });
+      document.getElementById('planSummary').innerHTML = `
+        <p>סה"כ קרן: ₪${totalP.toFixed(2)}</p>
+        <p>סה"כ החזר חודשי: ₪${totalM.toFixed(2)}</p>
+        <p>סה"כ עלות: ₪${totalCost.toFixed(2)}</p>`;
+    }
+
+    // ---- מחשבון זכאות ----
+    document.getElementById('calcElig').onclick = () => {
+      const svcH = +document.getElementById('svcH').value;
+      const svcW = +document.getElementById('svcW').value;
+      const kids = +document.getElementById('kids').value;
+      const sibH = +document.getElementById('sibH').value;
+      const sibW = +document.getElementById('sibW').value;
+      // חישוב שנות נישואין
+      let yrs = 0;
+      const md = document.getElementById('marriageDate').value;
+      if (md) {
+        const diff = (new Date() - new Date(md)) / (1000*60*60*24*365);
+        yrs = Math.floor(diff);
+      }
+      // ניקוד דוגמה: חודש שירות = 1 נקודה, ילד = 10, אח = 5, שנה נישואין = 5
+      let points = svcH + svcW + kids*10 + sibH*5 + sibW*5 + yrs*5;
+      const elig = points >= 50;  // סף מומלץ
+      document.getElementById('eligSummary').innerHTML = `
+        <p>סה"כ נקודות: <strong>${points}</strong></p>
+        <p>${elig 
+          ? '<span style="color:green">אתה עשוי להיות זכאי!</span>' 
+          : '<span style="color:red">ייתכן ואינך עומד בקריטריונים.</span>'}
+        </p>`;
+    };
+  </script>
 
 </body>
 </html>
