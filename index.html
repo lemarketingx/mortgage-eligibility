@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>מחשבון תמהיל משכנתא</title>
   <link href="https://fonts.googleapis.com/css?family=Heebo&display=swap" rel="stylesheet">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root {
       --gold: #D4AF37;
@@ -17,186 +13,229 @@
       --gray: #f5f5f5;
       --radius: 6px;
     }
-    * { box-sizing: border-box; margin:0; padding:0 }
+    * { box-sizing:border-box; margin:0; padding:0 }
     body {
       font-family:'Heebo',sans-serif;
       background:var(--gray);
       color:var(--black);
       padding:1rem;
     }
-    h1 { text-align:center; margin-bottom:1rem }
-    .btn {
-      padding:.6rem 1.2rem; border:none; border-radius:var(--radius);
-      cursor:pointer; font-weight:bold; margin:.5rem .3rem .5rem 0;
+    h1 {
+      text-align:center;
+      margin-bottom:1rem;
     }
-    .btn.gold { background:var(--gold); color:var(--black) }
-    .btn.dark { background:var(--black); color:var(--white) }
-    #calculator { max-width:900px; margin:0 auto; background:var(--white);
-      padding:1rem; border-radius:var(--radius); box-shadow:0 1px 4px rgba(0,0,0,0.1);
+    #calculator {
+      max-width:900px;
+      margin:0 auto;
+      background:var(--white);
+      padding:1rem;
+      border-radius:var(--radius);
+      box-shadow:0 1px 4px rgba(0,0,0,0.1);
     }
-    #header, .segment, #summary {
-      display:grid; grid-template-columns:
-        2fr 1fr 1fr 1fr 1fr 1fr auto; gap:.5rem; align-items:center;
+    .controls {
+      text-align:right;
       margin-bottom:.5rem;
     }
-    #header { font-weight:bold; }
-    .segment input, .segment select {
-      padding:.4rem; border:1px solid #ccc; border-radius:var(--radius);
+    .controls button {
+      padding:.5rem 1rem;
+      margin-left:.3rem;
+      border:none;
+      border-radius:var(--radius);
+      cursor:pointer;
+      background:var(--gold);
+      color:var(--black);
+      font-weight:bold;
+    }
+    table {
       width:100%;
+      border-collapse:collapse;
+      margin-bottom:1rem;
     }
-    .segment button { padding:.3rem .6rem }
-    #segments { margin-bottom:1rem }
-    #summary input {
-      padding:.4rem; border:1px solid #ccc; border-radius:var(--radius);
-      background:var(--gray); text-align:center; font-weight:500;
+    th, td {
+      border:1px solid #ccc;
+      padding:.5rem;
+      text-align:center;
     }
-    #chart-container { height:300px; margin-top:1rem }
+    input[type="number"], select {
+      width:100%;
+      padding:.4rem;
+      border:1px solid #ccc;
+      border-radius:var(--radius);
+    }
+    td .monthly, td .total {
+      display:block;
+      padding:.4rem 0;
+    }
+    td button.remove {
+      background:#e74c3c;
+      color:#fff;
+      border:none;
+      border-radius:var(--radius);
+      cursor:pointer;
+      font-size:1rem;
+      line-height:1;
+      width:1.8rem; height:1.8rem;
+    }
+    #summary p {
+      margin: .4rem 0;
+      font-weight:500;
+    }
+    #chart-container {
+      height:300px;
+    }
+    canvas { width:100%!important; height:100%!important; }
+    @media(max-width:600px){
+      th, td { font-size:.9rem; }
+      .controls button { width:100%; margin:0 .2rem .5rem 0; }
+    }
   </style>
 </head>
 <body>
   <h1>מחשבון תמהיל משכנתא</h1>
   <div id="calculator">
-    <div style="text-align:right; margin-bottom:.5rem">
-      <button id="addSegment" class="btn gold">+ הוסף מסלול</button>
-      <button id="exportPDF" class="btn dark">ייצא PDF</button>
-      <button id="exportExcel" class="btn dark">ייצא Excel</button>
+    <div class="controls">
+      <button id="addRow">+ הוסף מסלול</button>
     </div>
-
-    <div id="header">
-      <div>מסלול</div><div>סכום</div><div>תקופה (שנים)</div>
-      <div>ריבית (%)</div><div>החזר חודשי</div><div>עלות כוללת</div><div>×</div>
-    </div>
-    <div id="segments"></div>
+    <table>
+      <thead>
+        <tr>
+          <th>מסלול</th>
+          <th>סכום (₪)</th>
+          <th>תקופה (שנים)</th>
+          <th>ריבית (%)</th>
+          <th>החזר חודשי (₪)</th>
+          <th>עלות כוללת (₪)</th>
+          <th>×</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- שורות דינמיות יתווספו כאן -->
+      </tbody>
+    </table>
 
     <div id="summary">
-      <input id="totalPrincipal"    placeholder="סה״כ קרן">
-      <input id="totalMonthly"      placeholder="סה״כ החזר חודשי">
-      <input id="totalCost"         placeholder="סה״כ עלות">
-      <input id="paymentPerShekel"  placeholder="החזר לכל 1 ₪">
+      <p>סה"כ קרן: <span id="sumP">0</span> ₪</p>
+      <p>סה"כ החזר חודשי: <span id="sumM">0</span> ₪</p>
+      <p>סה"כ עלות: <span id="sumC">0</span> ₪</p>
+      <p>החזר לכל 1 ₪: <span id="perShekel">0.00</span></p>
     </div>
 
     <div id="chart-container">
-      <canvas id="amortChart"></canvas>
+      <canvas id="chart"></canvas>
     </div>
   </div>
 
+  <!-- Chart.js מ-CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-  (() => {
-    // Helpers
-    const fmt = x => x.toLocaleString('he-IL',{minimumFractionDigits:0});
-    const segmentsEl = $('#segments');
+  document.addEventListener('DOMContentLoaded',()=>{
+    const addRowBtn = document.getElementById('addRow');
+    const tbody     = document.getElementById('table-body');
     let chart;
 
-    // Add new segment row
-    function addSegment() {
-      const idx = segmentsEl.children().length + 1;
-      const row = $(`
-        <div class="segment">
-          <select class="type">
-            <option value="fixed">ריבית קבועה</option>
-            <option value="variable">ריבית משתנה</option>
-            <option value="prime">פריים</option>
+    // פונקציית PMT סטנדרטית
+    function pmt(rate, nper, pv){
+      if(rate === 0) return pv / nper;
+      return (pv * rate) / (1 - Math.pow(1+rate, -nper));
+    }
+
+    // הוספת שורה חדשה
+    function addRow(){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>
+          <select class="plan">
+            <option>קבועה</option>
+            <option>משתנה</option>
+            <option>פריים</option>
           </select>
-          <input type="text" class="princ" placeholder="₪">
-          <input type="number" class="term" placeholder="שנים">
-          <input type="number" class="rate" placeholder="%">
-          <input type="text" class="monthly" disabled>
-          <input type="text" class="cost" disabled>
-          <button type="button" class="remove-btn">×</button>
-        </div>`);
-      segmentsEl.append(row);
-      row.find('.princ,.term,.rate').on('input', recalc);
-      row.find('.remove-btn').on('click', () => { row.remove(); recalc() });
-    }
+        </td>
+        <td><input class="amount" type="number" min="0" placeholder="₪"></td>
+        <td><input class="years"  type="number" min="0" placeholder="שנים"></td>
+        <td><input class="rate"   type="number" min="0" placeholder="%"></td>
+        <td><span class="monthly">0</span></td>
+        <td><span class="total">0</span></td>
+        <td><button class="remove">×</button></td>
+      `;
+      tbody.appendChild(tr);
 
-    // Main calculation
-    function recalc() {
-      const allMonthly = [], allCost = [];
-      let totP=0, totM=0, totC=0, maxMonths=0;
-      $('.segment').each((i,el)=>{
-        const $el = $(el);
-        const P = parseFloat($el.find('.princ').val().replace(/,/g,''))||0;
-        const years = parseFloat($el.find('.term').val())||0;
-        const rAnnual = parseFloat($el.find('.rate').val())||0;
-        const n = years*12;
-        const r = rAnnual/100/12;
-        const monthly = r>0
-          ? (P*r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1)
-          : (n>0?P/n:0);
-        const cost = monthly * n;
-        $el.find('.monthly').val(fmt(monthly));
-        $el.find('.cost').val(fmt(cost));
-        totP += P; totM += monthly; totC += cost;
-        if(n>maxMonths) maxMonths=n;
-        // build series
-        const cum = Array.from({length:n+1},(_,m)=>monthly*(m));
-        allMonthly.push(cum);
-      });
-      $('#totalPrincipal').val(fmt(totP));
-      $('#totalMonthly').val(fmt(totM));
-      $('#totalCost').val(fmt(totC));
-      $('#paymentPerShekel').val((totC/totP||0).toFixed(2));
-
-      // chart data: sum of monthly payments each month
-      const labels = Array.from({length:maxMonths},(_,i)=>i+1);
-      const sums = labels.map((_,m) =>
-        allMonthly.reduce((s,arr)=> s + (arr[m]||0), 0)
+      // מאזיני אירועים
+      tr.querySelectorAll('.amount, .years, .rate').forEach(el=>
+        el.addEventListener('input', recalc)
       );
+      tr.querySelector('.remove').addEventListener('click',()=>{
+        tr.remove();
+        recalc();
+      });
+      recalc();
+    }
+
+    // עדכון חישובים וסיכומים
+    function recalc(){
+      const rows = tbody.querySelectorAll('tr');
+      let sumP=0, sumM=0, sumC=0;
+      let maxMonths = 0;
+      const monthlySeries = [];
+
+      rows.forEach(tr=>{
+        const P = parseFloat(tr.querySelector('.amount').value) || 0;
+        const Y = parseFloat(tr.querySelector('.years').value)  || 0;
+        const R = (parseFloat(tr.querySelector('.rate').value) || 0)/100/12;
+        const n = Y * 12;
+        const m = pmt(R, n, P);
+        const cost = m * n;
+
+        tr.querySelector('.monthly').textContent = Math.round(m).toLocaleString();
+        tr.querySelector('.total').textContent   = Math.round(cost).toLocaleString();
+
+        sumP += P;
+        sumM += m;
+        sumC += cost;
+        if(n > maxMonths) maxMonths = n;
+
+        // בונים דירוג חודשי
+        for(let i=0; i<n; i++){
+          monthlySeries[i] = (monthlySeries[i] || 0) + m;
+        }
+      });
+
+      // עדכון summary
+      document.getElementById('sumP').textContent       = sumP.toLocaleString();
+      document.getElementById('sumM').textContent       = Math.round(sumM).toLocaleString();
+      document.getElementById('sumC').textContent       = Math.round(sumC).toLocaleString();
+      document.getElementById('perShekel').textContent  = (sumP ? (sumC/sumP).toFixed(2) : '0.00');
+
+      // עדכון גרף
+      const labels = Array.from({length:maxMonths},(_,i)=>i+1);
       if(chart) chart.destroy();
-      chart = new Chart($('#amortChart'),{
-        type:'line',
-        data:{labels,sums: {label:'החזר חודשי כולל',data:sums,fill:false,borderColor:'#D4AF37'}},
-        options:{responsive:true, scales:{x:{title:{display:true,text:'חודש'}},y:{title:{display:true,text:'₪'}}}}
+      chart = new Chart(document.getElementById('chart'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'החזר חודשי',
+            data: monthlySeries,
+            borderColor: 'var(--gold)',
+            fill: false,
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: { title: { display: true, text: 'חודש' } },
+            y: { title: { display: true, text: '₪' } }
+          }
+        }
       });
     }
 
-    // Export PDF
-    $('#exportPDF').click(()=>{
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.text('תמהיל משכנתא',10,10);
-      // build table
-      const body = [];
-      $('.segment').each((i,el)=>{
-        const $el=$(el);
-        body.push([
-          $el.find('.type').val(),
-          $el.find('.princ').val(),
-          $el.find('.term').val(),
-          $el.find('.rate').val(),
-          $el.find('.monthly').val(),
-          $el.find('.cost').val()
-        ]);
-      });
-      doc.autoTable({ head:[['מסלול','סכום','תקופה','ריבית','החזר חודשי','עלות']] , body, startY:20 });
-      doc.save('mortgage_mix.pdf');
-    });
-
-    // Export Excel
-    $('#exportExcel').click(()=>{
-      const wb = XLSX.utils.book_new();
-      const data = [['מסלול','סכום','תקופה','ריבית','החזר חודשי','עלות']];
-      $('.segment').each((i,el)=>{
-        const $el=$(el);
-        data.push([
-          $el.find('.type').val(),
-          $el.find('.princ').val(),
-          $el.find('.term').val(),
-          $el.find('.rate').val(),
-          $el.find('.monthly').val(),
-          $el.find('.cost').val()
-        ]);
-      });
-      const ws = XLSX.utils.aoa_to_sheet(data);
-      XLSX.utils.book_append_sheet(wb,ws,'Sheet1');
-      XLSX.writeFile(wb,'mortgage_mix.xlsx');
-    });
-
-    // init
-    $('#addSegment').on('click', addSegment);
-    addSegment(); addSegment(); // שתי שורות כברירת מחדל
-    recalc();
-  })();
+    // אתחול: שתי שורות כברירת מחדל
+    addRow();
+    addRow();
+    // לחצן הוספה
+    addRowBtn.addEventListener('click', addRow);
+  });
   </script>
 </body>
 </html>
